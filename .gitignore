@@ -1,0 +1,112 @@
+# ═══════════════════════════════════════════════════════
+# INQUISITORIAL SEAL OF SECRECY
+# These files must NEVER be committed to the public archives
+# ═══════════════════════════════════════════════════════
+
+# ━━━ SACRED SECRETS (API Keys, Passwords) ━━━
+.env
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*secret*
+*apikey*
+*api-key*
+*password*
+*token*
+*.pem
+*.key
+*.pfx
+*.p12
+!package-lock.json
+
+# ━━━ TERRAFORM STATE (Contains Infrastructure Secrets) ━━━
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars.backup
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+crash.log
+crash.*.log
+
+# Note: terraform.tfvars is SAFE in our project (no secrets)
+# But be careful if you add secrets there later!
+
+# ━━━ AZURE DEPLOYMENT ARTIFACTS ━━━
+.azure/
+deployment-output.json
+.keyvault-name
+*.publishsettings
+*.azurewebsites.net
+
+# ━━━ NODE.JS / NEXT.JS ━━━
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.next/
+out/
+build/
+dist/
+.vercel
+
+
+local.settings.json
+__blobstorage__/
+__queuestorage__/
+__azurite_db*__.json
+.python_packages/
+
+# ━━━ IDE / EDITORS ━━━
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ━━━ TESTING ━━━
+coverage/
+.nyc_output/
+*.lcov
+
+# ━━━ LOGS ━━━
+logs/
+*.log
+npm-debug.log*
+
+# ━━━ OPERATING SYSTEM ━━━
+Thumbs.db
+.DS_Store
+
+# ━━━ TEMPORARY FILES ━━━
+tmp/
+temp/
+*.tmp
+
+# ━━━ BACKUPS ━━━
+*.backup
+*.bak
+*.old
+
+# ━━━ SECURITY SCAN RESULTS ━━━
+security-scan-results/
+vulnerability-reports/
+
+# ═══════════════════════════════════════════════════════
+# THESE ARE SAFE TO COMMIT (The Emperor Approves)
+# ═══════════════════════════════════════════════════════
+!.github/
+!.gitignore
+!.gitattributes
