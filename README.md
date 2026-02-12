@@ -19,15 +19,15 @@
 Print and Deploy is a production e-commerce platform selling custom 3D printed miniatures and terrain for tabletop gaming (D&D, Warhammer 40K, etc.). 
 
 **What makes this different from typical portfolio projects:**
-- ✅ **Real business** with actual customers and revenue
-- ✅ **Security-first architecture** designed from day one, not bolted on later
-- ✅ **Production-ready** infrastructure processing real payments
-- ✅ **Cost-optimized** to run at ~$2/month using Azure free tiers
-- ✅ **Fully documented** with comprehensive architecture and security docs
+-  **Real business** with actual customers and revenue
+-  **Security-first architecture** designed from day one, not bolted on later
+-  **Production-ready** infrastructure processing real payments
+-  **Cost-optimized** to run at ~$2/month using Azure free tiers
+-  **Fully documented** with comprehensive architecture and security docs
 
 ---
 
-## 🏗️ Architecture Highlights
+## Architecture Highlights
 
 ### Security First
 - **Azure Key Vault** for secrets management (Stripe keys, database credentials)
@@ -38,7 +38,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 - **PCI-compliant** payment processing via Stripe
 
 ### Modern Tech Stack
-- **Frontend:** Next.js 14 (TypeScript) on Azure Static Web Apps
+- **Frontend:** Next.js 16 (TypeScript) on Azure Static Web Apps
 - **API:** Azure Functions (TypeScript/Node.js) - serverless, auto-scaling
 - **Security Layer:** Azure Functions (Python) - threat detection, compliance
 - **Database:** Cosmos DB (NoSQL, free tier)
@@ -54,9 +54,9 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 
 ---
 
-## 📊 Project Status
+## Project Status
 
-### ✅ Phase 1: Security Foundation (COMPLETE)
+### Phase 1: Security Foundation (COMPLETE)
 **Deployed:** February 11, 2026
 
 - [x] Azure infrastructure deployed via Terraform
@@ -70,7 +70,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 
 ---
 
-### ⏳ Phase 2: Core Business Logic (IN PROGRESS)
+### Phase 2: Core Business Logic (IN PROGRESS)
 **Timeline:** February 11 - March 10, 2026
 
 **API Development (Week 1-2):**
@@ -91,7 +91,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 
 ---
 
-### ⏳ Phase 3: Polish & Testing (PLANNED)
+### Phase 3: Polish & Testing (PLANNED)
 **Timeline:** March 11-24, 2026
 
 - [ ] Product content (3D model images, descriptions)
@@ -104,7 +104,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 
 ---
 
-### 🚀 Phase 4: Launch (PLANNED)
+### Phase 4: Launch (PLANNED)
 **Timeline:** March 25-31, 2026
 
 - [ ] Domain configuration
@@ -116,7 +116,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 
 ---
 
-### 🐍 Phase 5: Python Security Enhancement (POST-LAUNCH)
+### Phase 5: Python Security Enhancement (POST-LAUNCH)
 **Timeline:** April 2026+
 
 - [ ] Key Vault audit log analyzer (threat detection)
@@ -205,7 +205,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 ```
 print-and-deploy/
 ├── docs/                          # Documentation
@@ -247,7 +247,7 @@ print-and-deploy/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Azure subscription (free tier works!)
@@ -290,7 +290,7 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 ### Core Documentation
 - **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design, tech stack, security architecture, design decisions
@@ -302,7 +302,7 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 
 ---
 
-## 🎯 Dual Purpose: Business + Portfolio
+## Dual Purpose: Business + Portfolio
 
 ### As a Business
 - **Real e-commerce platform** selling physical products
@@ -333,7 +333,7 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 
 ---
 
-## 🔧 Tech Stack Deep Dive
+## Tech Stack Deep Dive
 
 ### Why This Stack?
 
@@ -369,7 +369,7 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 
 ---
 
-## 🎓 Learning Objectives
+## Learning Objectives
 
 ### Cloud Engineering
 - [x] Infrastructure as Code (Terraform)
@@ -404,7 +404,7 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 
 ---
 
-## 📈 Metrics & Results
+## Metrics & Results
 
 ### Infrastructure (As of Feb 11, 2026)
 - **Uptime:** 100% (since deployment)
@@ -422,7 +422,7 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This is a personal business and portfolio project, but feedback and suggestions are welcome!
 
@@ -431,13 +431,13 @@ This is a personal business and portfolio project, but feedback and suggestions 
 
 ---
 
-## 📄 License
+##  License
 
 MIT License - See [LICENSE](LICENSE) file for details
 
 ---
 
-## 📞 Contact
+## Contact
 
 **Jason Morrissette**
 - **LinkedIn:** https://www.linkedin.com/in/jasonmorrissette/
@@ -446,7 +446,7 @@ MIT License - See [LICENSE](LICENSE) file for details
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built with Azure's generous free tier
 - Stripe for excellent payment processing
