@@ -110,3 +110,15 @@ vulnerability-reports/
 !.github/
 !.gitignore
 !.gitattributes
+
+api/local.settings.json
+
+# ━━━ AZURE FUNCTIONS ━━━
+local.settings.json
+__blobstorage__/
+__queuestorage__/
+__azurite_db*__.json
+.python_packages/
+.func/              # ← ADD THIS
+*.user              # ← ADD THIS
+.vscode/launch.json # ← ADD THIS (has local config)
