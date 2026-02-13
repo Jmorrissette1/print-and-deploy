@@ -8,28 +8,30 @@
 
 **A security-first e-commerce platform for 3D printed tabletop gaming accessories, built on Azure with enterprise-grade architecture.**
 
-🚀 **Live Site:** [printanddeploy.com](https://printanddeploy.com) *(launching March 31, 2026)*  
-🎯 **Convention Ready:** April 30, 2026  
+🚀 **Live Site:** [printanddeploy.com](https://printanddeploy.com) _(launching March 31, 2026)_  
+🎯 **Convention Ready:** April 25, 2026  
 💼 **Portfolio Project:** Cloud Security Engineering
 
 ---
 
 ## 🎯 Project Overview
 
-Print and Deploy is a production e-commerce platform selling custom 3D printed miniatures and terrain for tabletop gaming (D&D, Warhammer 40K, etc.). 
+Print and Deploy is a production e-commerce platform selling custom 3D printed miniatures and terrain for tabletop gaming (D&D, Warhammer 40K, etc.).
 
 **What makes this different from typical portfolio projects:**
--  **Real business** with actual customers and revenue
--  **Security-first architecture** designed from day one, not bolted on later
--  **Production-ready** infrastructure processing real payments
--  **Cost-optimized** to run at ~$2/month using Azure free tiers
--  **Fully documented** with comprehensive architecture and security docs
+
+- **Real business** with actual customers and revenue
+- **Security-first architecture** designed from day one, not bolted on later
+- **Production-ready** infrastructure processing real payments
+- **Cost-optimized** to run at ~$2/month using Azure free tiers
+- **Fully documented** with comprehensive architecture and security docs
 
 ---
 
 ## Architecture Highlights
 
 ### Security First
+
 - **Azure Key Vault** for secrets management (Stripe keys, database credentials)
 - **RBAC** authorization with least-privilege access
 - **Comprehensive audit logging** with 90-day retention
@@ -38,6 +40,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 - **PCI-compliant** payment processing via Stripe
 
 ### Modern Tech Stack
+
 - **Frontend:** Next.js 16 (TypeScript) on Azure Static Web Apps
 - **API:** Azure Functions (TypeScript/Node.js) - serverless, auto-scaling
 - **Security Layer:** Azure Functions (Python) - threat detection, compliance
@@ -47,6 +50,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 - **Monitoring:** Log Analytics + Application Insights
 
 ### Cost Optimization
+
 - **~$2/month** infrastructure cost (staying in Azure free tiers)
 - Serverless architecture (pay per use, no idle costs)
 - Free tier maximization strategy
@@ -57,6 +61,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 ## Project Status
 
 ### Phase 1: Security Foundation (COMPLETE)
+
 **Deployed:** February 11, 2026
 
 - [x] Azure infrastructure deployed via Terraform
@@ -71,9 +76,11 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 ---
 
 ### Phase 2: Core Business Logic (IN PROGRESS)
+
 **Timeline:** February 11 - March 10, 2026
 
 **API Development (Week 1-2):**
+
 - [ ] Deploy Cosmos DB
 - [ ] Products API (CRUD operations)
 - [ ] Shopping cart management
@@ -81,6 +88,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 - [ ] Order processing
 
 **Frontend Development (Week 3-4):**
+
 - [ ] Next.js application
 - [ ] Product catalog pages
 - [ ] Shopping cart UI
@@ -92,6 +100,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 ---
 
 ### Phase 3: Polish & Testing (PLANNED)
+
 **Timeline:** March 11-24, 2026
 
 - [ ] Product content (3D model images, descriptions)
@@ -105,6 +114,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 ---
 
 ### Phase 4: Launch (PLANNED)
+
 **Timeline:** March 25-31, 2026
 
 - [ ] Domain configuration
@@ -117,6 +127,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 ---
 
 ### Phase 5: Python Security Enhancement (POST-LAUNCH)
+
 **Timeline:** April 2026+
 
 - [ ] Key Vault audit log analyzer (threat detection)
@@ -133,6 +144,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 ### Defense in Depth
 
 **Layer 1: Secrets Management**
+
 - All secrets stored in Azure Key Vault
 - No hardcoded credentials anywhere
 - Encryption at rest (Azure managed keys)
@@ -140,18 +152,21 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 - Purge protection (prevents permanent deletion)
 
 **Layer 2: Access Control**
+
 - RBAC authorization model (modern, granular)
 - Managed identities (no service passwords)
 - Principle of least privilege
 - Individual role assignments (auditable)
 
 **Layer 3: Monitoring & Auditing**
+
 - All Key Vault access logged
 - 90-day retention (compliance ready)
 - Security event tracking
 - Alert capabilities for anomalies
 
 **Layer 4: Infrastructure Protection**
+
 - Infrastructure as Code (version controlled)
 - Lifecycle protection (prevent accidental deletion)
 - Comprehensive documentation
@@ -160,12 +175,14 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 ### PCI Compliance Strategy
 
 **Scope Reduction:**
+
 - Stripe handles ALL card data
 - Never store card numbers, CVV, expiration dates
 - Only store: `stripe_customer_id`, `stripe_payment_intent_id`
 - Use Stripe Elements (iframed card input from Stripe domain)
 
 **Our Responsibilities:**
+
 - Protect Stripe API keys (Key Vault ✓)
 - Verify webhook signatures (prevent spoofing ✓)
 - Use HTTPS everywhere (enforced ✓)
@@ -179,25 +196,26 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 
 ### Current Monthly Costs
 
-| Resource | Cost | Notes |
-|----------|------|-------|
-| **Key Vault** | $0 | Free tier (10K operations/month) |
-| **Log Analytics** | $0 | Free tier (5GB/month) |
-| **Resource Group** | $0 | No charge |
-| **TOTAL** | **$0/month** | ✅ |
+| Resource           | Cost         | Notes                            |
+| ------------------ | ------------ | -------------------------------- |
+| **Key Vault**      | $0           | Free tier (10K operations/month) |
+| **Log Analytics**  | $0           | Free tier (5GB/month)            |
+| **Resource Group** | $0           | No charge                        |
+| **TOTAL**          | **$0/month** | ✅                               |
 
 ### Projected Costs (Full Deployment)
 
-| Resource | Cost | Notes |
-|----------|------|-------|
-| **Azure Functions** | $0 | 1M executions/month free |
-| **Cosmos DB** | $0 | Free tier (1000 RU/s, 25GB) |
-| **Static Web Apps** | $0 | 100GB bandwidth free |
-| **Blob Storage** | $1 | Minimal storage + CDN |
-| **Azure DNS** | $0.50 | Domain zone |
-| **TOTAL** | **~$2/month** | ✅ |
+| Resource            | Cost          | Notes                       |
+| ------------------- | ------------- | --------------------------- |
+| **Azure Functions** | $0            | 1M executions/month free    |
+| **Cosmos DB**       | $0            | Free tier (1000 RU/s, 25GB) |
+| **Static Web Apps** | $0            | 100GB bandwidth free        |
+| **Blob Storage**    | $1            | Minimal storage + CDN       |
+| **Azure DNS**       | $0.50         | Domain zone                 |
+| **TOTAL**           | **~$2/month** | ✅                          |
 
 ### Cost Optimization Techniques
+
 - Serverless architecture (no idle costs)
 - Free tier maximization
 - Careful monitoring of limits
@@ -206,6 +224,7 @@ Print and Deploy is a production e-commerce platform selling custom 3D printed m
 ---
 
 ## Project Structure
+
 ```
 print-and-deploy/
 ├── docs/                          # Documentation
@@ -250,6 +269,7 @@ print-and-deploy/
 ## Getting Started
 
 ### Prerequisites
+
 - Azure subscription (free tier works!)
 - Terraform 1.6+
 - Node.js 20+
@@ -259,12 +279,14 @@ print-and-deploy/
 ### Quick Start
 
 **1. Clone the repository**
+
 ```bash
 git clone https://github.com/YOUR_USERNAME/print-and-deploy.git
 cd print-and-deploy
 ```
 
 **2. Deploy infrastructure**
+
 ```powershell
 # PowerShell
 cd terraform
@@ -277,11 +299,13 @@ terraform apply
 ```
 
 **3. Add secrets to Key Vault**
+
 ```powershell
 .\scripts\add-secrets.ps1
 ```
 
 **4. Verify deployment**
+
 ```powershell
 az keyvault list --resource-group rg-printanddeploy-prod
 ```
@@ -293,11 +317,13 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 ## Documentation
 
 ### Core Documentation
+
 - **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design, tech stack, security architecture, design decisions
 - **[DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LOG.md)** - Commands used, issues encountered, solutions, lessons learned
 - **[PYTHON_SECURITY_FUNCTIONS.md](docs/PYTHON_SECURITY_FUNCTIONS.md)** - Security automation specifications
 
 ### Guides
+
 - **[POWERSHELL_GUIDE.md](docs/POWERSHELL_GUIDE.md)** - PowerShell-specific commands and troubleshooting
 
 ---
@@ -305,12 +331,14 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 ## Dual Purpose: Business + Portfolio
 
 ### As a Business
+
 - **Real e-commerce platform** selling physical products
 - **Actual revenue** from customer orders
 - **Production operations** (fulfillment, customer support)
 - **Convention presence** (April 30, 2026)
 
 ### As a Portfolio
+
 - **Cloud security engineering** demonstration
 - **Infrastructure as Code** expertise (Terraform)
 - **Security-first architecture** design
@@ -321,14 +349,16 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 ### Interview Value
 
 **Instead of:**
+
 > "I built a todo app and deployed it to the cloud"
 
 **You can say:**
-> "I architected and operate a production e-commerce platform on Azure. 
-> It's a real business processing actual payments and serving customers. 
-> I designed it security-first with defense-in-depth architecture, deployed 
-> it with Terraform, and optimized costs to $2/month. The platform handles 
-> PCI-compliant payment processing and includes Python security automation 
+
+> "I architected and operate a production e-commerce platform on Azure.
+> It's a real business processing actual payments and serving customers.
+> I designed it security-first with defense-in-depth architecture, deployed
+> it with Terraform, and optimized costs to $2/month. The platform handles
+> PCI-compliant payment processing and includes Python security automation
 > for threat detection and compliance monitoring."
 
 ---
@@ -338,30 +368,35 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 ### Why This Stack?
 
 **TypeScript for Business Logic:**
+
 - Same language frontend/backend (faster development)
 - Strong typing (fewer runtime errors)
 - Excellent Azure Functions support
 - Fast cold starts (sub-second)
 
 **Python for Security:**
+
 - Industry standard for security automation
 - Superior libraries (azure-monitor-query, pandas)
 - Excellent for log analysis and pattern detection
 - Expected skill for cloud security roles
 
 **Azure Serverless:**
+
 - Auto-scaling (handles convention traffic spikes)
 - Pay per use (no idle costs)
 - Generous free tiers
 - Managed infrastructure (less ops overhead)
 
 **Terraform:**
+
 - Multi-cloud (transferable skills)
 - Industry standard (better for resume)
 - Version controlled infrastructure
 - Reproducible deployments
 
 **Stripe:**
+
 - PCI compliance handled for us
 - Excellent developer experience
 - Strong fraud prevention
@@ -372,6 +407,7 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 ## Learning Objectives
 
 ### Cloud Engineering
+
 - [x] Infrastructure as Code (Terraform)
 - [x] Azure cloud services (Functions, Cosmos DB, Key Vault)
 - [x] Serverless architecture patterns
@@ -380,6 +416,7 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 - [ ] Monitoring and observability
 
 ### Security
+
 - [x] Secrets management (Key Vault)
 - [x] RBAC and identity management
 - [x] Defense-in-depth architecture
@@ -389,6 +426,7 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 - [ ] Compliance validation
 
 ### Full-Stack Development
+
 - [x] Next.js and React
 - [ ] TypeScript API development
 - [ ] Payment processing integration
@@ -396,6 +434,7 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 - [ ] Email automation
 
 ### DevOps
+
 - [x] Git workflow
 - [x] Documentation practices
 - [ ] Automated testing
@@ -407,18 +446,20 @@ For detailed deployment instructions, see [DEPLOYMENT_LOG.md](docs/DEPLOYMENT_LO
 ## Metrics & Results
 
 ### Infrastructure (As of Feb 11, 2026)
+
 - **Uptime:** 100% (since deployment)
 - **Security Incidents:** 0
 - **Cost:** $0/month (in free tier)
 - **Deployment Time:** <5 minutes (via Terraform)
 
 ### Business (Launching March 31, 2026)
+
 - **Target Customers:** Tabletop gaming community
 - **First Convention:** April 30, 2026
 - **Products:** 3D printed miniatures and terrain
 - **Order Goal:** 50+ orders in first month
 
-*Metrics will be updated post-launch*
+_Metrics will be updated post-launch_
 
 ---
 
@@ -431,7 +472,7 @@ This is a personal business and portfolio project, but feedback and suggestions 
 
 ---
 
-##  License
+## License
 
 MIT License - See [LICENSE](LICENSE) file for details
 
@@ -440,6 +481,7 @@ MIT License - See [LICENSE](LICENSE) file for details
 ## Contact
 
 **Jason Morrissette**
+
 - **LinkedIn:** https://www.linkedin.com/in/jasonmorrissette/
 - **Email:** info@printanddeploy.com
 - **Website:** [printanddeploy.com](https://printanddeploy.com)
@@ -456,4 +498,4 @@ MIT License - See [LICENSE](LICENSE) file for details
 
 **Built with ⚔️ for the Emperor and the gaming community**
 
-*Print and Deploy - From STL to Table*
+_Print and Deploy - From STL to Table_

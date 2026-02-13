@@ -2,7 +2,7 @@
   "name": "print-and-deploy-api",
   "version": "1.0.0",
   "description": "Azure Functions API for Print and Deploy",
-  "main": "dist/src/functions/*.js",
+  "main": "dist/products/index.js",
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
@@ -19,7 +19,7 @@
   "license": "MIT",
   "dependencies": {
     "@azure/cosmos": "^4.0.0",
-    "@azure/functions": "^4.0.0",
+    "@azure/functions": "^4.5.0",
     "@azure/identity": "^4.0.0",
     "@azure/keyvault-secrets": "^4.8.0"
   },
