@@ -111,8 +111,6 @@ vulnerability-reports/
 !.gitignore
 !.gitattributes
 
-api/local.settings.json
-
 # ━━━ AZURE FUNCTIONS ━━━
 local.settings.json
 __blobstorage__/
