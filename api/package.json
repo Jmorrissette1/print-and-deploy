@@ -1,22 +1,30 @@
 {
-  "name": "api",
+  "name": "print-and-deploy-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Azure Functions API for Print and Deploy",
+  "main": "dist/src/functions/*.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rimraf dist",
+    "prestart": "npm run build",
+    "start": "func start"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "azure-functions",
+    "cosmos-db",
+    "e-commerce"
+  ],
+  "author": "Jason Morrissette",
+  "license": "MIT",
   "dependencies": {
-    "@azure/cosmos": "^4.9.1",
-    "@azure/identity": "^4.13.0",
-    "@azure/keyvault-secrets": "^4.10.0"
+    "@azure/cosmos": "^4.0.0",
+    "@azure/functions": "^4.0.0",
+    "@azure/identity": "^4.0.0",
+    "@azure/keyvault-secrets": "^4.8.0"
   },
   "devDependencies": {
-    "@azure/functions": "^4.11.2",
-    "@types/node": "^25.2.3",
-    "typescript": "^5.9.3"
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
   }
 }
