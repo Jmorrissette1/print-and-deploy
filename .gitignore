@@ -27,6 +27,7 @@
 *.tfstate
 *.tfstate.*
 *.tfplan
+*.tfvars    
 *.tfvars.backup
 override.tf
 override.tf.json
