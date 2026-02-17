@@ -15,7 +15,7 @@ export default function Home() {
             </div>
             <nav className="hidden md:flex space-x-8">
               <a
-                href="#products"
+                href="/products"
                 className="text-red-700 hover:text-red-600 transition font-semibold"
               >
                 Products

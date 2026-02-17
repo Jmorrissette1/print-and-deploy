@@ -1,5 +1,8 @@
 {
   "dependencies": {
+    "@azure/cosmos": "^4.9.1",
+    "@azure/functions": "^4.11.2",
+    "functions": "^1.0.9",
     "next": "^16.1.6"
   },
   "devDependencies": {
