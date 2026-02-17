@@ -3,7 +3,7 @@
 **Project:** E-commerce platform for 3D printed tabletop gaming accessories  
 **Cloud Provider:** Microsoft Azure  
 **Infrastructure:** Terraform (Infrastructure as Code)  
-**Status:** Phase 1 Complete - Security Foundation Deployed  
+**Status:** Phase 1 Complete - Security Foundation Deployed
 
 ---
 
@@ -26,6 +26,7 @@
 **Print and Deploy** is an e-commerce platform selling custom 3D printed miniatures and terrain for tabletop gaming (D&D, Warhammer, etc.).
 
 **Key Requirements:**
+
 - Accept payments securely (Stripe integration)
 - Store customer data safely (PII protection)
 - Maintain PCI compliance
@@ -35,6 +36,7 @@
 ### Technical Approach
 
 Built with a **security-first** mindset:
+
 - All secrets managed in Azure Key Vault
 - Defense-in-depth security architecture
 - Infrastructure as Code for reproducibility
@@ -46,6 +48,7 @@ Built with a **security-first** mindset:
 ## Architecture Diagram
 
 ### Current State (Phase 1 - Security Foundation)
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Azure Subscription                       │
@@ -94,6 +97,7 @@ Future:
 ```
 
 ### Future State (Complete Platform)
+
 ```
                     ┌──────────────┐
                     │   Internet   │
@@ -177,25 +181,27 @@ Future:
 
 
 ```
+
 ---
 
 ## Azure Resources
 
 ### Deployed Resources (Phase 1)
 
-| Resource | Name | Type | Purpose | Cost |
-|----------|------|------|---------|------|
-| **Resource Group** | `rg-printanddeploy-prod` | Container | Logical grouping | $0 |
-| **Key Vault** | `kv-pd-prod-muurllhg` | Security | Secrets management | $0 (free tier) |
-| **Log Analytics** | `log-printanddeploy-prod` | Monitoring | Audit logging | $0 (free tier) |
-| **Diagnostic Setting** | `keyvault-diagnostics` | Monitoring | KV → Log Analytics | $0 (included) |
-| **Role Assignment** | N/A | Security | RBAC permissions | $0 (included) |
+| Resource               | Name                      | Type       | Purpose            | Cost           |
+| ---------------------- | ------------------------- | ---------- | ------------------ | -------------- |
+| **Resource Group**     | `rg-printanddeploy-prod`  | Container  | Logical grouping   | $0             |
+| **Key Vault**          | `kv-pd-prod-muurllhg`     | Security   | Secrets management | $0 (free tier) |
+| **Log Analytics**      | `log-printanddeploy-prod` | Monitoring | Audit logging      | $0 (free tier) |
+| **Diagnostic Setting** | `keyvault-diagnostics`    | Monitoring | KV → Log Analytics | $0 (included)  |
+| **Role Assignment**    | N/A                       | Security   | RBAC permissions   | $0 (included)  |
 
 **Total Current Cost:** $0/month
 
 ### Resource Details
 
 #### Azure Key Vault
+
 ```
 Name: kv-pd-prod-muurllhg
 SKU: Standard
@@ -209,6 +215,7 @@ Features:
 ```
 
 #### Log Analytics Workspace
+
 ```
 Name: log-printanddeploy-prod
 SKU: PerGB2018
@@ -224,6 +231,7 @@ Purpose: Security audit trail
 ### Defense in Depth
 
 **Layer 1: Secrets Management**
+
 - All secrets stored in Azure Key Vault
 - No secrets in code or configuration files
 - Encryption at rest (Azure managed keys)
@@ -231,18 +239,21 @@ Purpose: Security audit trail
 - Purge protection prevents permanent deletion
 
 **Layer 2: Access Control**
+
 - RBAC authorization model (modern, granular)
 - Principle of least privilege
 - Managed identities (future) - no service account passwords
 - Individual role assignments (auditable)
 
 **Layer 3: Monitoring & Auditing**
+
 - All Key Vault access logged
 - 90-day retention (compliance ready)
 - Query capabilities for investigations
 - Alert capabilities (future)
 
 **Layer 4: Infrastructure Protection**
+
 - Infrastructure as Code (version controlled)
 - Terraform state tracked (knows what exists)
 - Lifecycle protection (prevent accidental deletion)
@@ -254,28 +265,30 @@ Purpose: Security audit trail
 
 **Threats Mitigated:**
 
-| Threat | Mitigation | Status |
-|--------|------------|--------|
-| **Secrets in code** | Key Vault + .gitignore | Mitigated |
-| **Unauthorized access** | RBAC + Azure AD auth | Mitigated |
-| **Accidental deletion** | Soft delete + purge protection | Mitigated |
-| **No audit trail** | Log Analytics + diagnostics | Mitigated |
-| **Secrets in logs** | No secrets logged, only metadata | Mitigated |
-| **DDoS attacks** | Azure Front Door + WAF (future) | Planned |
-| **Payment data breach** | Stripe handles all card data | By design |
-| **SQL injection** | NoSQL (Cosmos DB) + parameterized queries | In progress |
+| Threat                  | Mitigation                                | Status      |
+| ----------------------- | ----------------------------------------- | ----------- |
+| **Secrets in code**     | Key Vault + .gitignore                    | Mitigated   |
+| **Unauthorized access** | RBAC + Azure AD auth                      | Mitigated   |
+| **Accidental deletion** | Soft delete + purge protection            | Mitigated   |
+| **No audit trail**      | Log Analytics + diagnostics               | Mitigated   |
+| **Secrets in logs**     | No secrets logged, only metadata          | Mitigated   |
+| **DDoS attacks**        | Azure Front Door + WAF (future)           | Planned     |
+| **Payment data breach** | Stripe handles all card data              | By design   |
+| **SQL injection**       | NoSQL (Cosmos DB) + parameterized queries | In progress |
 
 ---
 
 ### PCI Compliance Strategy
 
 **Scope Reduction:**
+
 - Stripe handles ALL card data
 - Never store card numbers, CVV, expiration
 - Only store: `stripe_customer_id`, `stripe_payment_intent_id`
 - Use Stripe Elements (iframed card input from Stripe domain)
 
 **Our Responsibilities:**
+
 - Protect Stripe API keys (Key Vault)
 - Verify webhook signatures (prevent spoofing)
 - Use HTTPS everywhere
@@ -288,15 +301,16 @@ Purpose: Security audit trail
 ## Cost Analysis
 
 ### Current Monthly Costs
+
 ```
 Azure Key Vault:
   Operations: 0-10,000/month = $0 (free tier)
   Storage: <100 secrets = $0
-  
+
 Log Analytics:
   Ingestion: <5 GB/month = $0 (free tier)
   Retention: 90 days included
-  
+
 Resource Group: $0 (no cost)
 Diagnostic Settings: $0 (included)
 
@@ -305,6 +319,7 @@ TOTAL: $0/month
 ```
 
 ### Future Costs (Projected)
+
 ```
 When fully deployed:
 
@@ -321,16 +336,19 @@ ESTIMATED TOTAL: ~$2/month
 ### Cost Optimization Strategy
 
 **Free Tier Maximization:**
+
 - Serverless architecture (pay per use, not idle time)
 - Careful monitoring of free tier limits
 - Alerts when approaching thresholds
 
 **Resource Right-Sizing:**
+
 - Start small, scale based on actual usage
 - Use metrics to inform scaling decisions
 - Review costs monthly
 
 **Design Decisions for Cost:**
+
 - Chose Cosmos DB free tier over SQL Database
 - Chose Functions over App Service (no idle costs)
 - Chose Static Web Apps over App Service
@@ -343,11 +361,13 @@ ESTIMATED TOTAL: ~$2/month
 ### Why Azure Key Vault?
 
 **Alternatives Considered:**
+
 - X Environment variables → Not encrypted, visible in portal
 - X App Config Service → Less secure than Key Vault
 - X Hardcoded secrets → Security nightmare
 
 **Why Key Vault:**
+
 - Built for secrets management
 - Encryption at rest and in transit
 - Audit logging built-in
@@ -360,12 +380,14 @@ ESTIMATED TOTAL: ~$2/month
 ### Why RBAC over Access Policies?
 
 **Access Policies (Legacy):**
+
 - Per-principal permissions
 - Vault-level only
 - No inheritance
 - Harder to audit
 
 **RBAC (Modern):**
+
 - Azure AD integration
 - Fine-grained roles
 - Inheritable
@@ -379,6 +401,7 @@ ESTIMATED TOTAL: ~$2/month
 ### Why Soft Delete + Purge Protection?
 
 **Real-world scenario:**
+
 ```
 Without protection:
 Developer: "terraform destroy" → Vault gone forever
@@ -400,6 +423,7 @@ Impact: Minimal, lessons learned
 ### Why West US 2?
 
 **Factors Considered:**
+
 - My location: Bainbridge Island, WA
 - Customer base: US-based (tabletop gaming community)
 - Latency: ~10ms vs ~70ms (East US)
@@ -412,12 +436,12 @@ Impact: Minimal, lessons learned
 
 ---
 
-
 ## Future Phases
 
 ### Phase 2: Application Infrastructure (Next)
 
 **Deploy:**
+
 - Azure Functions (API layer)
 - Cosmos DB (database)
 - Blob Storage (product images)
@@ -430,6 +454,7 @@ Impact: Minimal, lessons learned
 ### Phase 3: Application Development
 
 **Build:**
+
 - Next.js frontend (product catalog, cart, checkout)
 - Azure Functions API (orders, products, webhooks)
 - Stripe integration (payments)
@@ -442,6 +467,7 @@ Impact: Minimal, lessons learned
 ### Phase 4: Security Hardening
 
 **Add:**
+
 - Azure Front Door + WAF
 - Rate limiting
 - IP restrictions on Key Vault
@@ -455,6 +481,7 @@ Impact: Minimal, lessons learned
 ### Phase 5: Launch
 
 **Final steps:**
+
 - Domain configuration
 - SSL certificates
 - Production Stripe keys
@@ -464,11 +491,26 @@ Impact: Minimal, lessons learned
 
 **Timeframe:** 1 week
 
+## Security Automation Roadmap
+
+Future enhancements include automated security analysis and
+detection engineering using Python-based services to analyze
+audit telemetry, detect anomalies, and assist incident response.
+
+Goals:
+
+- Automated audit log analysis
+- Secret access anomaly detection
+- Configuration drift monitoring
+- Compliance validation
+- AI-assisted incident triage
+
 ---
 
 ## Appendix
 
 ### Terraform File Structure
+
 ```
 terraform/
 ├── main.tf                 # Provider configuration
@@ -484,6 +526,7 @@ terraform/
 ```
 
 ### Key Terraform Commands
+
 ```bash
 terraform init      # Initialize, download providers
 terraform validate  # Check syntax
@@ -495,6 +538,7 @@ terraform output    # Show outputs
 ```
 
 ### Useful Azure CLI Commands
+
 ```bash
 # Key Vault
 az keyvault list
