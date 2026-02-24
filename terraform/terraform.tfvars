@@ -30,4 +30,8 @@ tags = {
 cosmos_db_throughput = 400  # Free tier
 function_app_sku     = "Y1" # Consumption plan (free)
 
+# Azure AD Configuration
+
+azure_ad_tenant_id = "d1d29a42-4077-43af-aa2d-45f3b1290044"
+azure_ad_client_id = "2c6b7cea-3fe7-477f-83d3-80ee0e770439"
 

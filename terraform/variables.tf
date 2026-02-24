@@ -134,6 +134,23 @@ variable "function_app_sku" {
   # P1V2 = App Service Plan (dedicated compute)
 }
 
+# Azure AD Authentication Variables
+
+variable "azure_ad_tenant_id" {
+  description = "Azure AD Tenant ID for authentication"
+  type        = string
+  sensitive   = true
+}
+
+variable "azure_ad_client_id" {
+  description = "Azure AD Client ID (Application ID) for the admin app"
+  type        = string
+  sensitive   = true
+}
+
+
+
+
 # ═══════════════════════════════════════════════════════
 # THE CODEX PROVIDES
 # ═══════════════════════════════════════════════════════

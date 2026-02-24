@@ -1,0 +1,14 @@
+﻿{
+  "oauth2PermissionScopes": [
+    {
+      "adminConsentDescription": "Access PrintAndDeploy API",
+      "adminConsentDisplayName": "Access PrintAndDeploy API",
+      "id": "5ed7116c-7d62-4634-be84-3c0425a26a0f",
+      "isEnabled": true,
+      "type": "User",
+      "userConsentDescription": "Access PrintAndDeploy API",
+      "userConsentDisplayName": "Access PrintAndDeploy API",
+      "value": "access_as_user"
+    }
+  ]
+}
