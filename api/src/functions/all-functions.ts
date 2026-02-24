@@ -156,7 +156,7 @@ export async function listProducts(
   try {
     const container = await getProductsContainer();
     const { resources: products } = await container.items
-      .query("SELECT * FROM c ORDER BY c.updatedAt DESC")
+      .query("SELECT * FROM c WHERE NOT IS_DEFINED(c.isDeleted) OR c.isDeleted = false ORDER BY c.updatedAt DESC")
       .fetchAll();
 
     return {
@@ -176,6 +176,8 @@ export async function listProducts(
   }
 }
 
+
+
 app.http("manage-products-list", {
   methods: ["GET"],
   authLevel: "anonymous",
@@ -183,7 +185,225 @@ app.http("manage-products-list", {
   handler: listProducts,
 });
 
-// ===== CREATE PRODUCT =====
+// ===== GET SINGLE PRODUCT =====
+
+export async function getProduct(
+  request: HttpRequest,
+  context: InvocationContext
+): Promise<HttpResponseInit> {
+  context.log("GET /api/manage/products/{id}");
+
+  const authContext = await authenticateUser(request, context);
+
+  if (!authContext.isAuthenticated) {
+    return {
+      status: 401,
+      jsonBody: { error: "Unauthorized", message: authContext.error },
+    };
+  }
+
+  if (!hasRole(authContext, ["Viewer", "Editor", "Admin"])) {
+    return {
+      status: 403,
+      jsonBody: { error: "Forbidden", message: "Insufficient permissions" },
+    };
+  }
+
+  try {
+    const id = request.params.id;
+    const container = await getProductsContainer();
+    const { resources: products } = await container.items
+      .query({
+        query: "SELECT * FROM c WHERE c.id = @id",
+        parameters: [{ name: "@id", value: id }],
+      })
+      .fetchAll();
+
+    if (products.length === 0) {
+      return {
+        status: 404,
+        jsonBody: { error: "Not found", message: `Product ${id} not found` },
+      };
+    }
+
+    return { status: 200, jsonBody: products[0] };
+  } catch (error: any) {
+    context.error("Error:", error);
+    return {
+      status: 500,
+      jsonBody: { error: "Internal server error", message: error.message },
+    };
+  }
+}
+
+app.http("manage-products-get", {
+  methods: ["GET"],
+  authLevel: "anonymous",
+  route: "manage/products/{id}",
+  handler: getProduct,
+});
+
+// ===== DELETE PRODUCT (SOFT DELETE) FUNCTION ===== //
+export async function deleteProduct(
+  request: HttpRequest,
+  context: InvocationContext
+): Promise<HttpResponseInit> {
+  context.log("DELETE /api/manage/products/{id}");
+
+  const authContext = await authenticateUser(request, context);
+
+  if (!authContext.isAuthenticated) {
+    return {
+      status: 401,
+      jsonBody: { error: "Unauthorized", message: authContext.error },
+    };
+  }
+
+  if (!hasRole(authContext, ["Admin"])) {
+    return {
+      status: 403,
+      jsonBody: { error: "Forbidden", message: "Insufficient permissions. Requires Admin role." },
+    };
+  }
+
+  try {
+    const id = request.params.id;
+    const container = await getProductsContainer();
+
+    const { resources: products } = await container.items
+      .query({
+        query: "SELECT * FROM c WHERE c.id = @id",
+        parameters: [{ name: "@id", value: id }],
+      })
+      .fetchAll();
+
+    if (products.length === 0) {
+      return {
+        status: 404,
+        jsonBody: { error: "Not found", message: `Product ${id} not found` },
+      };
+    }
+
+    const existing = products[0];
+
+    const deleted = {
+      ...existing,
+      isDeleted: true,
+      deletedAt: new Date().toISOString(),
+      deletedBy: authContext.userEmail || "unknown",
+      updatedAt: new Date().toISOString(),
+      updatedBy: authContext.userEmail || "unknown",
+    };
+
+    await container.item(id, existing.category).replace(deleted);
+
+    context.log(`Product soft-deleted by ${authContext.userEmail}: ${id}`);
+
+    return {
+      status: 200,
+      jsonBody: { message: `Product ${id} deleted`, deletedBy: authContext.userEmail },
+    };
+  } catch (error: any) {
+    context.error("Error deleting product:", error);
+    return {
+      status: 500,
+      jsonBody: { error: "Internal server error", message: error.message },
+    };
+  }
+}
+
+app.http("manage-products-delete", {
+  methods: ["DELETE"],
+  authLevel: "anonymous",
+  route: "manage/products/{id}",
+  handler: deleteProduct,
+});
+
+
+// ===== UPDATE PRODUCT ===== //
+
+export async function updateProduct(
+  request: HttpRequest,
+  context: InvocationContext
+): Promise<HttpResponseInit> {
+  context.log("PUT /api/manage/products/{id}");
+
+  const authContext = await authenticateUser(request, context);
+
+  if (!authContext.isAuthenticated) {
+    return {
+      status: 401,
+      jsonBody: { error: "Unauthorized", message: authContext.error },
+    };
+  }
+
+  if (!hasRole(authContext, ["Editor", "Admin"])) {
+    return {
+      status: 403,
+      jsonBody: { error: "Forbidden", message: "Insufficient permissions. Requires Editor or Admin role." },
+    };
+  }
+
+  try {
+    const id = request.params.id;
+    const body = (await request.json()) as any;
+    const container = await getProductsContainer();
+
+    // Find existing product
+    const { resources: products } = await container.items
+      .query({
+        query: "SELECT * FROM c WHERE c.id = @id",
+        parameters: [{ name: "@id", value: id }],
+      })
+      .fetchAll();
+
+    if (products.length === 0) {
+      return {
+        status: 404,
+        jsonBody: { error: "Not found", message: `Product ${id} not found` },
+      };
+    }
+
+    const existing = products[0];
+
+    const updated = {
+      ...existing,
+      ...body,
+      id: existing.id,
+      category: existing.category,
+      createdAt: existing.createdAt,
+      createdBy: existing.createdBy,
+      updatedAt: new Date().toISOString(),
+      updatedBy: authContext.userEmail || "unknown",
+    };
+
+    const { resource: result } = await container
+      .item(id, existing.category)
+      .replace(updated);
+
+    context.log(`Product updated by ${authContext.userEmail}: ${id}`);
+
+    return { status: 200, jsonBody: result };
+  } catch (error: any) {
+    context.error("Error updating product:", error);
+    return {
+      status: 500,
+      jsonBody: { error: "Internal server error", message: error.message },
+    };
+  }
+}
+
+app.http("manage-products-update", {
+  methods: ["PUT"],
+  authLevel: "anonymous",
+  route: "manage/products/{id}",
+  handler: updateProduct,
+});
+
+
+
+// ===== CREATE PRODUCT FUCNTION ===== //
+
 export async function createProduct(
   request: HttpRequest,
   context: InvocationContext,
