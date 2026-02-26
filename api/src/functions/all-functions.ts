@@ -19,6 +19,8 @@ const AZURE_AD_CLIENT_ID = process.env.AZURE_AD_CLIENT_ID || "";
 const AZURE_AD_AUDIENCE =
   process.env.AZURE_AD_AUDIENCE || `api://${AZURE_AD_CLIENT_ID}`;
 
+const ISSUER = `https://sts.windows.net/${AZURE_AD_TENANT_ID}/`;
+
 let cosmosClient: CosmosClient;
 
 function getCosmosClient(): CosmosClient {
@@ -62,7 +64,7 @@ async function validateAzureADToken(token: string): Promise<any> {
       getSigningKey,
       {
         audience: AZURE_AD_AUDIENCE,
-        issuer: `https://sts.windows.net/${AZURE_AD_TENANT_ID}/`,
+        issuer: ISSUER,
         algorithms: ["RS256"],
       },
       (err, decoded) => {
@@ -105,13 +107,18 @@ async function authenticateUser(
 
   try {
     const decoded: any = await validateAzureADToken(token);
+
+    if (decoded.tid !== AZURE_AD_TENANT_ID) {
+      throw new Error("Invalid tenant");
+    }
+
     const userId = decoded.oid || decoded.sub;
     const userEmail =
       decoded.email || decoded.preferred_username || decoded.upn;
     const userName = decoded.name;
     const roles = decoded.roles || [];
 
-    context.log(`Authenticated: ${userEmail} with roles: ${roles.join(", ")}`);
+    context.log(`Authenticated oid=${userId} roles=${roles.join(",")}`);
 
     return {
       isAuthenticated: true,
@@ -125,7 +132,7 @@ async function authenticateUser(
     return {
       isAuthenticated: false,
       roles: [],
-      error: `Invalid token: ${error.message}`,
+      error: "Invalid or expired token",
     };
   }
 }
@@ -156,7 +163,9 @@ export async function listProducts(
   try {
     const container = await getProductsContainer();
     const { resources: products } = await container.items
-      .query("SELECT * FROM c WHERE NOT IS_DEFINED(c.isDeleted) OR c.isDeleted = false ORDER BY c.updatedAt DESC")
+      .query(
+        "SELECT * FROM c WHERE NOT IS_DEFINED(c.isDeleted) OR c.isDeleted = false ORDER BY c.updatedAt DESC",
+      )
       .fetchAll();
 
     return {
@@ -176,8 +185,6 @@ export async function listProducts(
   }
 }
 
-
-
 app.http("manage-products-list", {
   methods: ["GET"],
   authLevel: "anonymous",
@@ -189,7 +196,7 @@ app.http("manage-products-list", {
 
 export async function getProduct(
   request: HttpRequest,
-  context: InvocationContext
+  context: InvocationContext,
 ): Promise<HttpResponseInit> {
   context.log("GET /api/manage/products/{id}");
 
@@ -246,7 +253,7 @@ app.http("manage-products-get", {
 // ===== DELETE PRODUCT (SOFT DELETE) FUNCTION ===== //
 export async function deleteProduct(
   request: HttpRequest,
-  context: InvocationContext
+  context: InvocationContext,
 ): Promise<HttpResponseInit> {
   context.log("DELETE /api/manage/products/{id}");
 
@@ -262,7 +269,10 @@ export async function deleteProduct(
   if (!hasRole(authContext, ["Admin"])) {
     return {
       status: 403,
-      jsonBody: { error: "Forbidden", message: "Insufficient permissions. Requires Admin role." },
+      jsonBody: {
+        error: "Forbidden",
+        message: "Insufficient permissions. Requires Admin role.",
+      },
     };
   }
 
@@ -301,7 +311,10 @@ export async function deleteProduct(
 
     return {
       status: 200,
-      jsonBody: { message: `Product ${id} deleted`, deletedBy: authContext.userEmail },
+      jsonBody: {
+        message: `Product ${id} deleted`,
+        deletedBy: authContext.userEmail,
+      },
     };
   } catch (error: any) {
     context.error("Error deleting product:", error);
@@ -319,12 +332,11 @@ app.http("manage-products-delete", {
   handler: deleteProduct,
 });
 
-
 // ===== UPDATE PRODUCT ===== //
 
 export async function updateProduct(
   request: HttpRequest,
-  context: InvocationContext
+  context: InvocationContext,
 ): Promise<HttpResponseInit> {
   context.log("PUT /api/manage/products/{id}");
 
@@ -340,7 +352,10 @@ export async function updateProduct(
   if (!hasRole(authContext, ["Editor", "Admin"])) {
     return {
       status: 403,
-      jsonBody: { error: "Forbidden", message: "Insufficient permissions. Requires Editor or Admin role." },
+      jsonBody: {
+        error: "Forbidden",
+        message: "Insufficient permissions. Requires Editor or Admin role.",
+      },
     };
   }
 
@@ -399,8 +414,6 @@ app.http("manage-products-update", {
   route: "manage/products/{id}",
   handler: updateProduct,
 });
-
-
 
 // ===== CREATE PRODUCT FUCNTION ===== //
 
@@ -470,4 +483,92 @@ app.http("manage-products-create", {
   authLevel: "anonymous",
   route: "manage/products",
   handler: createProduct,
+});
+
+// PUBLIC LIST PRODUCTS
+export async function publicListProducts(
+  request: HttpRequest,
+  context: InvocationContext,
+): Promise<HttpResponseInit> {
+  context.log("GET /api/products (public)");
+
+  try {
+    const container = await getProductsContainer();
+    const { resources: products } = await container.items
+      .query(
+        "SELECT c.id, c.name, c.description, c.price, c.category, c.imageUrl, c.tags, c.specifications, c.inStock " +
+          "FROM c WHERE (NOT IS_DEFINED(c.isDeleted) OR c.isDeleted = false)",
+      )
+      .fetchAll();
+
+    return {
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      jsonBody: { products, count: products.length },
+    };
+  } catch (error: any) {
+    context.error("Error:", error);
+    return {
+      status: 500,
+      jsonBody: { error: "Internal server error" },
+    };
+  }
+}
+
+app.http("public-products-list", {
+  methods: ["GET"],
+  authLevel: "anonymous",
+  route: "products",
+  handler: publicListProducts,
+});
+
+// PUBLIC GET SINGLE PRODUCT
+export async function publicGetProduct(
+  request: HttpRequest,
+  context: InvocationContext,
+): Promise<HttpResponseInit> {
+  context.log("GET /api/products/{id} (public)");
+
+  try {
+    const id = request.params.id;
+    const container = await getProductsContainer();
+    const { resources: products } = await container.items
+      .query({
+        query:
+          "SELECT c.id, c.name, c.description, c.price, c.category, c.imageUrl, c.tags, c.specifications, c.inStock " +
+          "FROM c WHERE c.id = @id AND (NOT IS_DEFINED(c.isDeleted) OR c.isDeleted = false)",
+        parameters: [{ name: "@id", value: id }],
+      })
+      .fetchAll();
+
+    if (products.length === 0) {
+      return {
+        status: 404,
+        jsonBody: { error: "Product not found" },
+      };
+    }
+
+    return {
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      jsonBody: products[0],
+    };
+  } catch (error: any) {
+    context.error("Error:", error);
+    return {
+      status: 500,
+      jsonBody: { error: "Internal server error" },
+    };
+  }
+}
+
+app.http("public-products-get", {
+  methods: ["GET"],
+  authLevel: "anonymous",
+  route: "products/{id}",
+  handler: publicGetProduct,
 });
