@@ -21,6 +21,66 @@ const AZURE_AD_AUDIENCE =
 
 const ISSUER = `https://sts.windows.net/${AZURE_AD_TENANT_ID}/`;
 
+const ALLOWED_ORIGINS = [
+  "https://www.printanddeploy.com",
+  "https://printanddeploy.com",
+  "http://localhost:3000",
+];
+
+
+// Cors Orgin Function //
+function getCorsOrigin(request: HttpRequest): string {
+  const origin = request.headers.get("origin") || "";
+  return ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+}
+
+interface ProductInput {
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  imageUrl?: string;
+  tags?: string[];
+  inStock?: boolean;
+  stock?: number;
+  specifications?: Record<string, string>;
+}
+
+function validateProductInput(body: any): { valid: boolean; error?: string; data?: ProductInput } {
+  if (!body.name || typeof body.name !== "string" || body.name.length > 200) {
+    return { valid: false, error: "name is required and must be under 200 characters" };
+  }
+  if (!body.category || typeof body.category !== "string" || body.category.length > 50) {
+    return { valid: false, error: "category is required and must be under 50 characters" };
+  }
+  if (body.price !== undefined && (typeof body.price !== "number" || body.price < 0 || body.price > 99999)) {
+    return { valid: false, error: "price must be a number between 0 and 99999" };
+  }
+  if (body.description && (typeof body.description !== "string" || body.description.length > 2000)) {
+    return { valid: false, error: "description must be under 2000 characters" };
+  }
+  if (body.imageUrl && (typeof body.imageUrl !== "string" || body.imageUrl.length > 500)) {
+    return { valid: false, error: "imageUrl must be under 500 characters" };
+  }
+
+  const data: ProductInput = {
+    name: body.name.trim(),
+    description: body.description?.trim() || "",
+    price: body.price || 0,
+    category: body.category.trim().toLowerCase(),
+    imageUrl: body.imageUrl?.trim(),
+    tags: Array.isArray(body.tags) ? body.tags.slice(0, 20).map((t: any) => String(t).trim()) : undefined,
+    inStock: typeof body.inStock === "boolean" ? body.inStock : true,
+    stock: typeof body.stock === "number" ? Math.floor(body.stock) : undefined,
+    specifications: body.specifications && typeof body.specifications === "object" && !Array.isArray(body.specifications)
+      ? body.specifications
+      : undefined,
+  };
+
+  return { valid: true, data };
+}
+
+
 let cosmosClient: CosmosClient;
 
 function getCosmosClient(): CosmosClient {
@@ -180,7 +240,7 @@ export async function listProducts(
     context.error("Error:", error);
     return {
       status: 500,
-      jsonBody: { error: "Internal server error", message: error.message },
+      jsonBody: { error: "Internal server error" },
     };
   }
 }
@@ -238,7 +298,7 @@ export async function getProduct(
     context.error("Error:", error);
     return {
       status: 500,
-      jsonBody: { error: "Internal server error", message: error.message },
+      jsonBody: { error: "Internal server error" },
     };
   }
 }
@@ -320,7 +380,7 @@ export async function deleteProduct(
     context.error("Error deleting product:", error);
     return {
       status: 500,
-      jsonBody: { error: "Internal server error", message: error.message },
+      jsonBody: { error: "Internal server error" },
     };
   }
 }
@@ -362,9 +422,19 @@ export async function updateProduct(
   try {
     const id = request.params.id;
     const body = (await request.json()) as any;
+
+    if (body.name && (typeof body.name !== "string" || body.name.length > 200)) {
+      return { status: 400, jsonBody: { error: "Bad request", message: "name must be under 200 characters" } };
+    }
+    if (body.price !== undefined && (typeof body.price !== "number" || body.price < 0 || body.price > 99999)) {
+      return { status: 400, jsonBody: { error: "Bad request", message: "price must be a number between 0 and 99999" } };
+    }
+    if (body.description && (typeof body.description !== "string" || body.description.length > 2000)) {
+      return { status: 400, jsonBody: { error: "Bad request", message: "description must be under 2000 characters" } };
+    }
+
     const container = await getProductsContainer();
 
-    // Find existing product
     const { resources: products } = await container.items
       .query({
         query: "SELECT * FROM c WHERE c.id = @id",
@@ -381,9 +451,19 @@ export async function updateProduct(
 
     const existing = products[0];
 
+    const allowedUpdates: Record<string, any> = {};
+    if (body.name) allowedUpdates.name = body.name.trim();
+    if (body.description !== undefined) allowedUpdates.description = body.description.trim();
+    if (body.price !== undefined) allowedUpdates.price = body.price;
+    if (body.imageUrl !== undefined) allowedUpdates.imageUrl = body.imageUrl.trim();
+    if (body.tags) allowedUpdates.tags = Array.isArray(body.tags) ? body.tags.slice(0, 20).map((t: any) => String(t).trim()) : existing.tags;
+    if (body.inStock !== undefined) allowedUpdates.inStock = Boolean(body.inStock);
+    if (body.stock !== undefined) allowedUpdates.stock = Math.floor(body.stock);
+    if (body.specifications) allowedUpdates.specifications = body.specifications;
+
     const updated = {
       ...existing,
-      ...body,
+      ...allowedUpdates,
       id: existing.id,
       category: existing.category,
       createdAt: existing.createdAt,
@@ -403,7 +483,7 @@ export async function updateProduct(
     context.error("Error updating product:", error);
     return {
       status: 500,
-      jsonBody: { error: "Internal server error", message: error.message },
+      jsonBody: { error: "Internal server error" },
     };
   }
 }
@@ -443,12 +523,13 @@ export async function createProduct(
   }
 
   try {
-    const body = (await request.json()) as any;
+   const body = (await request.json()) as any;
+    const validation = validateProductInput(body);
 
-    if (!body.category) {
+    if (!validation.valid) {
       return {
         status: 400,
-        jsonBody: { error: "Bad request", message: "category is required" },
+        jsonBody: { error: "Bad request", message: validation.error },
       };
     }
 
@@ -457,7 +538,7 @@ export async function createProduct(
 
     const product = {
       id: crypto.randomUUID(),
-      ...body,
+      ...validation.data,
       createdAt: now,
       updatedAt: now,
       createdBy: authContext.userEmail || "unknown",
@@ -473,7 +554,7 @@ export async function createProduct(
     context.error("Error creating product:", error);
     return {
       status: 500,
-      jsonBody: { error: "Internal server error", message: error.message },
+      jsonBody: { error: "Internal server error" },
     };
   }
 }
@@ -484,6 +565,8 @@ app.http("manage-products-create", {
   route: "manage/products",
   handler: createProduct,
 });
+
+
 
 // PUBLIC LIST PRODUCTS
 export async function publicListProducts(
@@ -504,7 +587,7 @@ export async function publicListProducts(
     return {
       status: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": getCorsOrigin(request),
       },
       jsonBody: { products, count: products.length },
     };
@@ -553,7 +636,7 @@ export async function publicGetProduct(
     return {
       status: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": getCorsOrigin(request),
       },
       jsonBody: products[0],
     };
