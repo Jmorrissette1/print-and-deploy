@@ -2,7 +2,7 @@
     "name": "print-and-deploy-api",
     "version": "1.0.0",
     "description": "Azure Functions API for Print and Deploy",
-    "main": "dist/functions/all-functions.js",
+    "main": "dist/functions/index.js",
     "scripts": {
         "build": "tsc",
         "watch": "tsc --watch",

@@ -31,8 +31,7 @@ export default function ProductsPage() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        // HARD-CODED for testing
-        const fullUrl = "http://localhost:7071/api/products";
+        const fullUrl = "https://func-printanddeploy-prod.azurewebsites.net/api/products";
         
         console.log("Fetching from:", fullUrl);
         
@@ -47,7 +46,7 @@ export default function ProductsPage() {
         const data = await response.json();
         console.log("Got data:", data);
         
-        setProducts(data.data);
+        setProducts(data.products);
       } catch (err) {
         console.error("Full error:", err);
         setError("Failed to load products. Please try again.");
