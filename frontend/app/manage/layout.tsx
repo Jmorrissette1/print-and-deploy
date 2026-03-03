@@ -4,22 +4,22 @@ import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { loginRequest } from "../../lib/msal-config";
 import Link from "next/link";
 
-export default function ManageLayout({ children }: { children: React.ReactNode }) {
+export default function ManageLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const isAuthenticated = useIsAuthenticated();
   const { instance, accounts } = useMsal();
 
-  const handleLogin = async () => {
-    try {
-      await instance.loginPopup(loginRequest);
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
+  const handleLogin = () => {
+    instance.loginRedirect(loginRequest);
   };
 
   const handleLogout = () => {
     instance.logoutPopup();
   };
-  
+
   if (!isAuthenticated) {
     return (
       <main className="min-h-screen bg-black flex items-center justify-center">
@@ -47,16 +47,27 @@ export default function ManageLayout({ children }: { children: React.ReactNode }
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
-              <Link href="/" className="text-2xl font-bold text-red-800 tracking-wider">
+              <Link
+                href="/"
+                className="text-2xl font-bold text-red-800 tracking-wider"
+              >
                 PRINT & DEPLOY
               </Link>
-              <span className="text-purple-500 text-sm">| INVENTORY MANAGEMENT</span>
+              <span className="text-purple-500 text-sm">
+                | INVENTORY MANAGEMENT
+              </span>
             </div>
             <nav className="flex items-center space-x-6">
-              <Link href="/manage" className="text-red-700 hover:text-red-600 font-semibold transition">
+              <Link
+                href="/manage"
+                className="text-red-700 hover:text-red-600 font-semibold transition"
+              >
                 Products
               </Link>
-              <Link href="/manage/create" className="text-red-700 hover:text-red-600 font-semibold transition">
+              <Link
+                href="/manage/create"
+                className="text-red-700 hover:text-red-600 font-semibold transition"
+              >
                 Add New
               </Link>
               <span className="text-gray-500 text-sm">
@@ -72,9 +83,7 @@ export default function ManageLayout({ children }: { children: React.ReactNode }
           </div>
         </div>
       </header>
-      <div className="container mx-auto px-4 py-8">
-        {children}
-      </div>
+      <div className="container mx-auto px-4 py-8">{children}</div>
     </main>
   );
 }

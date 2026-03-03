@@ -1,14 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMsal } from "@azure/msal-react";
-import { loginRequest, apiBaseUrl } from "../../../lib/msal-config";
-import { useRouter } from "next/navigation";
+import { loginRequest, apiBaseUrl } from "../../../../lib/msal-config";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 
-export default function CreateProductPage() {
+export default function EditProductPage() {
   const { instance } = useMsal();
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
+
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,7 +20,7 @@ export default function CreateProductPage() {
     name: "",
     description: "",
     price: "",
-    category: "miniatures",
+    category: "",
     imageUrl: "",
     inStock: true,
     stock: "",
@@ -37,6 +41,34 @@ export default function CreateProductPage() {
     }
   }
 
+  async function fetchProduct() {
+    try {
+      const token = await getToken();
+      if (!token) return;
+
+      const response = await fetch(`${apiBaseUrl}/api/manage/products/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
+
+      const product = await response.json();
+      setForm({
+        name: product.name || "",
+        description: product.description || "",
+        price: product.price?.toString() || "",
+        category: product.category || "",
+        imageUrl: product.imageUrl || "",
+        inStock: product.inStock !== false,
+        stock: product.stock?.toString() || "",
+      });
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -46,18 +78,16 @@ export default function CreateProductPage() {
       const token = await getToken();
       if (!token) return;
 
-      const body = {
-        name: form.name,
-        description: form.description,
-        price: parseFloat(form.price),
-        category: form.category,
-        imageUrl: form.imageUrl || undefined,
-        inStock: form.inStock,
-        stock: form.stock ? parseInt(form.stock) : undefined,
-      };
+      const body: Record<string, any> = {};
+      if (form.name) body.name = form.name;
+      if (form.description !== undefined) body.description = form.description;
+      if (form.price) body.price = parseFloat(form.price);
+      if (form.imageUrl !== undefined) body.imageUrl = form.imageUrl;
+      body.inStock = form.inStock;
+      if (form.stock) body.stock = parseInt(form.stock);
 
-      const response = await fetch(`${apiBaseUrl}/api/manage/products`, {
-        method: "POST",
+      const response = await fetch(`${apiBaseUrl}/api/manage/products/${id}`, {
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -67,7 +97,7 @@ export default function CreateProductPage() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message || "Failed to create product");
+        throw new Error(data.message || "Failed to update product");
       }
 
       router.push("/manage");
@@ -78,10 +108,22 @@ export default function CreateProductPage() {
     }
   }
 
+  useEffect(() => {
+    fetchProduct();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-800 text-xl animate-pulse">Loading product...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-red-800">Add New Product</h1>
+        <h1 className="text-3xl font-bold text-red-800">Edit Product</h1>
         <Link
           href="/manage"
           className="text-gray-500 hover:text-gray-300 transition"
@@ -96,6 +138,13 @@ export default function CreateProductPage() {
         </div>
       )}
 
+      <div className="bg-purple-950/10 border border-purple-900/30 px-4 py-2 mb-6">
+        <p className="text-purple-400 text-sm">
+          Category: <span className="font-bold uppercase">{form.category}</span>
+          <span className="text-gray-500 ml-2">(cannot be changed)</span>
+        </p>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-red-700 font-semibold mb-2">
@@ -108,7 +157,6 @@ export default function CreateProductPage() {
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             className="w-full bg-black border border-red-950 text-gray-200 px-4 py-3 focus:border-red-700 focus:outline-none"
-            placeholder="e.g. Orc Warboss"
           />
         </div>
 
@@ -122,7 +170,6 @@ export default function CreateProductPage() {
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             className="w-full bg-black border border-red-950 text-gray-200 px-4 py-3 focus:border-red-700 focus:outline-none"
-            placeholder="Describe the product..."
           />
         </div>
 
@@ -140,27 +187,9 @@ export default function CreateProductPage() {
               value={form.price}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
               className="w-full bg-black border border-red-950 text-gray-200 px-4 py-3 focus:border-red-700 focus:outline-none"
-              placeholder="29.99"
             />
           </div>
 
-          <div>
-            <label className="block text-red-700 font-semibold mb-2">
-              Category *
-            </label>
-            <select
-              value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="w-full bg-black border border-red-950 text-gray-200 px-4 py-3 focus:border-red-700 focus:outline-none"
-            >
-              <option value="miniatures">Miniatures</option>
-              <option value="terrain">Terrain</option>
-              <option value="accessories">Accessories</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-6">
           <div>
             <label className="block text-red-700 font-semibold mb-2">
               Stock Quantity
@@ -171,23 +200,21 @@ export default function CreateProductPage() {
               value={form.stock}
               onChange={(e) => setForm({ ...form, stock: e.target.value })}
               className="w-full bg-black border border-red-950 text-gray-200 px-4 py-3 focus:border-red-700 focus:outline-none"
-              placeholder="10"
             />
           </div>
+        </div>
 
-          <div>
-            <label className="block text-red-700 font-semibold mb-2">
-              Image URL
-            </label>
-            <input
-              type="text"
-              maxLength={500}
-              value={form.imageUrl}
-              onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-              className="w-full bg-black border border-red-950 text-gray-200 px-4 py-3 focus:border-red-700 focus:outline-none"
-              placeholder="/products/image.jpg"
-            />
-          </div>
+        <div>
+          <label className="block text-red-700 font-semibold mb-2">
+            Image URL
+          </label>
+          <input
+            type="text"
+            maxLength={500}
+            value={form.imageUrl}
+            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+            className="w-full bg-black border border-red-950 text-gray-200 px-4 py-3 focus:border-red-700 focus:outline-none"
+          />
         </div>
 
         <div className="flex items-center gap-3">
@@ -209,7 +236,7 @@ export default function CreateProductPage() {
             disabled={saving}
             className="bg-red-900 hover:bg-red-800 text-white px-8 py-3 font-bold border-2 border-red-800 transition-all disabled:opacity-50"
           >
-            {saving ? "Creating..." : "Create Product"}
+            {saving ? "Saving..." : "Save Changes"}
           </button>
           <Link
             href="/manage"
