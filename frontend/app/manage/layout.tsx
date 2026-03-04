@@ -17,14 +17,16 @@ export default function ManageLayout({
   };
 
   const handleLogout = () => {
-    instance.logoutPopup();
+    sessionStorage.clear();
+    instance.logoutRedirect({
+      postLogoutRedirectUri: "/",
+    });
   };
 
   if (!isAuthenticated) {
     return (
       <main className="min-h-screen bg-black flex items-center justify-center">
         <div className="bg-gradient-to-b from-red-950/20 to-black border border-red-950 p-12 text-center max-w-md">
-          <div className="text-6xl mb-6">🔒</div>
           <h1 className="text-3xl font-bold text-red-800 mb-4">
             Inventory Management
           </h1>
