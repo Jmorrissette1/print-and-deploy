@@ -1,29 +1,37 @@
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
+import {
+  app,
+  HttpRequest,
+  HttpResponseInit,
+  InvocationContext,
+} from "@azure/functions";
 import { getProductsContainer } from "../services/cosmos";
 import { authenticateUser, hasRole } from "../middleware/auth";
 import { validateProductInput } from "../utils/validation";
+import { corsResponse, handlePreflight } from "../utils/cors";
 
 // ===== LIST PRODUCTS =====
 export async function listProducts(
   request: HttpRequest,
   context: InvocationContext,
 ): Promise<HttpResponseInit> {
+  if (request.method === "OPTIONS") return handlePreflight(request);
+
   context.log("GET /api/manage/products");
 
   const authContext = await authenticateUser(request, context);
 
   if (!authContext.isAuthenticated) {
-    return {
+    return corsResponse(request, {
       status: 401,
       jsonBody: { error: "Unauthorized", message: authContext.error },
-    };
+    });
   }
 
   if (!hasRole(authContext, ["Viewer", "Editor", "Admin"])) {
-    return {
+    return corsResponse(request, {
       status: 403,
       jsonBody: { error: "Forbidden", message: "Insufficient permissions" },
-    };
+    });
   }
 
   try {
@@ -34,25 +42,25 @@ export async function listProducts(
       )
       .fetchAll();
 
-    return {
+    return corsResponse(request, {
       status: 200,
       jsonBody: {
         products,
         count: products.length,
         requestedBy: authContext.userEmail,
       },
-    };
+    });
   } catch (error: any) {
     context.error("Error:", error);
-    return {
+    return corsResponse(request, {
       status: 500,
       jsonBody: { error: "Internal server error" },
-    };
+    });
   }
 }
 
 app.http("manage-products-list", {
-  methods: ["GET"],
+  methods: ["GET", "OPTIONS"],
   authLevel: "anonymous",
   route: "manage/products",
   handler: listProducts,
@@ -63,22 +71,24 @@ export async function getProduct(
   request: HttpRequest,
   context: InvocationContext,
 ): Promise<HttpResponseInit> {
+  if (request.method === "OPTIONS") return handlePreflight(request);
+
   context.log("GET /api/manage/products/{id}");
 
   const authContext = await authenticateUser(request, context);
 
   if (!authContext.isAuthenticated) {
-    return {
+    return corsResponse(request, {
       status: 401,
       jsonBody: { error: "Unauthorized", message: authContext.error },
-    };
+    });
   }
 
   if (!hasRole(authContext, ["Viewer", "Editor", "Admin"])) {
-    return {
+    return corsResponse(request, {
       status: 403,
       jsonBody: { error: "Forbidden", message: "Insufficient permissions" },
-    };
+    });
   }
 
   try {
@@ -92,24 +102,27 @@ export async function getProduct(
       .fetchAll();
 
     if (products.length === 0) {
-      return {
+      return corsResponse(request, {
         status: 404,
         jsonBody: { error: "Not found", message: `Product ${id} not found` },
-      };
+      });
     }
 
-    return { status: 200, jsonBody: products[0] };
+    return corsResponse(request, {
+      status: 200,
+      jsonBody: products[0],
+    });
   } catch (error: any) {
     context.error("Error:", error);
-    return {
+    return corsResponse(request, {
       status: 500,
       jsonBody: { error: "Internal server error" },
-    };
+    });
   }
 }
 
 app.http("manage-products-get", {
-  methods: ["GET"],
+  methods: ["GET", "OPTIONS"],
   authLevel: "anonymous",
   route: "manage/products/{id}",
   handler: getProduct,
@@ -120,25 +133,27 @@ export async function createProduct(
   request: HttpRequest,
   context: InvocationContext,
 ): Promise<HttpResponseInit> {
+  if (request.method === "OPTIONS") return handlePreflight(request);
+
   context.log("POST /api/manage/products");
 
   const authContext = await authenticateUser(request, context);
 
   if (!authContext.isAuthenticated) {
-    return {
+    return corsResponse(request, {
       status: 401,
       jsonBody: { error: "Unauthorized", message: authContext.error },
-    };
+    });
   }
 
   if (!hasRole(authContext, ["Editor", "Admin"])) {
-    return {
+    return corsResponse(request, {
       status: 403,
       jsonBody: {
         error: "Forbidden",
         message: "Insufficient permissions. Requires Editor or Admin role.",
       },
-    };
+    });
   }
 
   try {
@@ -146,10 +161,10 @@ export async function createProduct(
     const validation = validateProductInput(body);
 
     if (!validation.valid) {
-      return {
+      return corsResponse(request, {
         status: 400,
         jsonBody: { error: "Bad request", message: validation.error },
-      };
+      });
     }
 
     const container = await getProductsContainer();
@@ -168,18 +183,21 @@ export async function createProduct(
 
     context.log(`Product created by ${authContext.userEmail}: ${product.id}`);
 
-    return { status: 201, jsonBody: created };
+    return corsResponse(request, {
+      status: 201,
+      jsonBody: created,
+    });
   } catch (error: any) {
     context.error("Error creating product:", error);
-    return {
+    return corsResponse(request, {
       status: 500,
       jsonBody: { error: "Internal server error" },
-    };
+    });
   }
 }
 
 app.http("manage-products-create", {
-  methods: ["POST"],
+  methods: ["POST", "OPTIONS"],
   authLevel: "anonymous",
   route: "manage/products",
   handler: createProduct,
@@ -190,39 +208,68 @@ export async function updateProduct(
   request: HttpRequest,
   context: InvocationContext,
 ): Promise<HttpResponseInit> {
+  if (request.method === "OPTIONS") return handlePreflight(request);
+
   context.log("PUT /api/manage/products/{id}");
 
   const authContext = await authenticateUser(request, context);
 
   if (!authContext.isAuthenticated) {
-    return {
+    return corsResponse(request, {
       status: 401,
       jsonBody: { error: "Unauthorized", message: authContext.error },
-    };
+    });
   }
 
   if (!hasRole(authContext, ["Editor", "Admin"])) {
-    return {
+    return corsResponse(request, {
       status: 403,
       jsonBody: {
         error: "Forbidden",
         message: "Insufficient permissions. Requires Editor or Admin role.",
       },
-    };
+    });
   }
 
   try {
     const id = request.params.id;
     const body = (await request.json()) as any;
 
-    if (body.name && (typeof body.name !== "string" || body.name.length > 200)) {
-      return { status: 400, jsonBody: { error: "Bad request", message: "name must be under 200 characters" } };
+    if (
+      body.name &&
+      (typeof body.name !== "string" || body.name.length > 200)
+    ) {
+      return corsResponse(request, {
+        status: 400,
+        jsonBody: {
+          error: "Bad request",
+          message: "name must be under 200 characters",
+        },
+      });
     }
-    if (body.price !== undefined && (typeof body.price !== "number" || body.price < 0 || body.price > 99999)) {
-      return { status: 400, jsonBody: { error: "Bad request", message: "price must be a number between 0 and 99999" } };
+    if (
+      body.price !== undefined &&
+      (typeof body.price !== "number" || body.price < 0 || body.price > 99999)
+    ) {
+      return corsResponse(request, {
+        status: 400,
+        jsonBody: {
+          error: "Bad request",
+          message: "price must be a number between 0 and 99999",
+        },
+      });
     }
-    if (body.description && (typeof body.description !== "string" || body.description.length > 2000)) {
-      return { status: 400, jsonBody: { error: "Bad request", message: "description must be under 2000 characters" } };
+    if (
+      body.description &&
+      (typeof body.description !== "string" || body.description.length > 2000)
+    ) {
+      return corsResponse(request, {
+        status: 400,
+        jsonBody: {
+          error: "Bad request",
+          message: "description must be under 2000 characters",
+        },
+      });
     }
 
     const container = await getProductsContainer();
@@ -235,23 +282,30 @@ export async function updateProduct(
       .fetchAll();
 
     if (products.length === 0) {
-      return {
+      return corsResponse(request, {
         status: 404,
         jsonBody: { error: "Not found", message: `Product ${id} not found` },
-      };
+      });
     }
 
     const existing = products[0];
 
     const allowedUpdates: Record<string, any> = {};
     if (body.name) allowedUpdates.name = body.name.trim();
-    if (body.description !== undefined) allowedUpdates.description = body.description.trim();
+    if (body.description !== undefined)
+      allowedUpdates.description = body.description.trim();
     if (body.price !== undefined) allowedUpdates.price = body.price;
-    if (body.imageUrl !== undefined) allowedUpdates.imageUrl = body.imageUrl.trim();
-    if (body.tags) allowedUpdates.tags = Array.isArray(body.tags) ? body.tags.slice(0, 20).map((t: any) => String(t).trim()) : existing.tags;
-    if (body.inStock !== undefined) allowedUpdates.inStock = Boolean(body.inStock);
+    if (body.imageUrl !== undefined)
+      allowedUpdates.imageUrl = body.imageUrl.trim();
+    if (body.tags)
+      allowedUpdates.tags = Array.isArray(body.tags)
+        ? body.tags.slice(0, 20).map((t: any) => String(t).trim())
+        : existing.tags;
+    if (body.inStock !== undefined)
+      allowedUpdates.inStock = Boolean(body.inStock);
     if (body.stock !== undefined) allowedUpdates.stock = Math.floor(body.stock);
-    if (body.specifications) allowedUpdates.specifications = body.specifications;
+    if (body.specifications)
+      allowedUpdates.specifications = body.specifications;
 
     const updated = {
       ...existing,
@@ -270,18 +324,21 @@ export async function updateProduct(
 
     context.log(`Product updated by ${authContext.userEmail}: ${id}`);
 
-    return { status: 200, jsonBody: result };
+    return corsResponse(request, {
+      status: 200,
+      jsonBody: result,
+    });
   } catch (error: any) {
     context.error("Error updating product:", error);
-    return {
+    return corsResponse(request, {
       status: 500,
       jsonBody: { error: "Internal server error" },
-    };
+    });
   }
 }
 
 app.http("manage-products-update", {
-  methods: ["PUT"],
+  methods: ["PUT", "OPTIONS"],
   authLevel: "anonymous",
   route: "manage/products/{id}",
   handler: updateProduct,
@@ -292,25 +349,27 @@ export async function deleteProduct(
   request: HttpRequest,
   context: InvocationContext,
 ): Promise<HttpResponseInit> {
+  if (request.method === "OPTIONS") return handlePreflight(request);
+
   context.log("DELETE /api/manage/products/{id}");
 
   const authContext = await authenticateUser(request, context);
 
   if (!authContext.isAuthenticated) {
-    return {
+    return corsResponse(request, {
       status: 401,
       jsonBody: { error: "Unauthorized", message: authContext.error },
-    };
+    });
   }
 
   if (!hasRole(authContext, ["Admin"])) {
-    return {
+    return corsResponse(request, {
       status: 403,
       jsonBody: {
         error: "Forbidden",
         message: "Insufficient permissions. Requires Admin role.",
       },
-    };
+    });
   }
 
   try {
@@ -325,10 +384,10 @@ export async function deleteProduct(
       .fetchAll();
 
     if (products.length === 0) {
-      return {
+      return corsResponse(request, {
         status: 404,
         jsonBody: { error: "Not found", message: `Product ${id} not found` },
-      };
+      });
     }
 
     const existing = products[0];
@@ -346,24 +405,24 @@ export async function deleteProduct(
 
     context.log(`Product soft-deleted by ${authContext.userEmail}: ${id}`);
 
-    return {
+    return corsResponse(request, {
       status: 200,
       jsonBody: {
         message: `Product ${id} deleted`,
         deletedBy: authContext.userEmail,
       },
-    };
+    });
   } catch (error: any) {
     context.error("Error deleting product:", error);
-    return {
+    return corsResponse(request, {
       status: 500,
       jsonBody: { error: "Internal server error" },
-    };
+    });
   }
 }
 
 app.http("manage-products-delete", {
-  methods: ["DELETE"],
+  methods: ["DELETE", "OPTIONS"],
   authLevel: "anonymous",
   route: "manage/products/{id}",
   handler: deleteProduct,
