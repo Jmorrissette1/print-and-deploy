@@ -125,7 +125,7 @@ export default function EditProductPage() {
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-red-800">Edit Product</h1>
         <Link
-          href="/armory"
+          href="/manage"
           className="text-gray-500 hover:text-gray-300 transition"
         >
           ← Back to Inventory
@@ -239,7 +239,7 @@ export default function EditProductPage() {
             {saving ? "Saving..." : "Save Changes"}
           </button>
           <Link
-            href="/armory"
+            href="/manage"
             className="bg-transparent text-gray-400 hover:text-gray-200 px-8 py-3 font-bold border-2 border-gray-700 transition-all"
           >
             Cancel

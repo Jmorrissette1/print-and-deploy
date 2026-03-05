@@ -1,3 +1,2 @@
-import "./manage-products";
+import "./armory-products";
 import "./public-products";
-

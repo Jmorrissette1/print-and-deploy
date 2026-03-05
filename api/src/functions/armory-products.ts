@@ -9,13 +9,69 @@ import { authenticateUser, hasRole } from "../middleware/auth";
 import { validateProductInput } from "../utils/validation";
 import { corsResponse, handlePreflight } from "../utils/cors";
 
-// ===== LIST PRODUCTS =====
-export async function listProducts(
+// ═════════════════════════════════════════════════════
+// COLLECTION HANDLER - /api/armory/products
+// Handles: GET (list) + POST (create) + OPTIONS
+// ═════════════════════════════════════════════════════
+
+async function armoryProductsCollection(
   request: HttpRequest,
   context: InvocationContext,
 ): Promise<HttpResponseInit> {
   if (request.method === "OPTIONS") return handlePreflight(request);
 
+  if (request.method === "GET") return listProducts(request, context);
+  if (request.method === "POST") return createProduct(request, context);
+
+  return corsResponse(request, {
+    status: 405,
+    jsonBody: { error: "Method not allowed" },
+  });
+}
+
+app.http("armory-products-collection", {
+  methods: ["GET", "POST", "OPTIONS"],
+  authLevel: "anonymous",
+  route: "armory/products",
+  handler: armoryProductsCollection,
+});
+
+// ═════════════════════════════════════════════════════
+// ITEM HANDLER - /api/armory/products/{id}
+// Handles: GET (single) + PUT (update) + DELETE + OPTIONS
+// ═════════════════════════════════════════════════════
+
+async function armoryProductsItem(
+  request: HttpRequest,
+  context: InvocationContext,
+): Promise<HttpResponseInit> {
+  if (request.method === "OPTIONS") return handlePreflight(request);
+
+  if (request.method === "GET") return getProduct(request, context);
+  if (request.method === "PUT") return updateProduct(request, context);
+  if (request.method === "DELETE") return deleteProduct(request, context);
+
+  return corsResponse(request, {
+    status: 405,
+    jsonBody: { error: "Method not allowed" },
+  });
+}
+
+app.http("armory-products-item", {
+  methods: ["GET", "PUT", "DELETE", "OPTIONS"],
+  authLevel: "anonymous",
+  route: "armory/products/{id}",
+  handler: armoryProductsItem,
+});
+
+// ═════════════════════════════════════════════════════
+// LIST PRODUCTS
+// ═════════════════════════════════════════════════════
+
+async function listProducts(
+  request: HttpRequest,
+  context: InvocationContext,
+): Promise<HttpResponseInit> {
   context.log("GET /api/armory/products");
 
   const authContext = await authenticateUser(request, context);
@@ -59,20 +115,14 @@ export async function listProducts(
   }
 }
 
-app.http("armory-products-list", {
-  methods: ["GET", "OPTIONS"],
-  authLevel: "anonymous",
-  route: "armory/products",
-  handler: listProducts,
-});
+// ═════════════════════════════════════════════════════
+// GET SINGLE PRODUCT
+// ═════════════════════════════════════════════════════
 
-// ===== GET SINGLE PRODUCT =====
-export async function getProduct(
+async function getProduct(
   request: HttpRequest,
   context: InvocationContext,
 ): Promise<HttpResponseInit> {
-  if (request.method === "OPTIONS") return handlePreflight(request);
-
   context.log("GET /api/armory/products/{id}");
 
   const authContext = await authenticateUser(request, context);
@@ -121,20 +171,14 @@ export async function getProduct(
   }
 }
 
-app.http("armory-products-get", {
-  methods: ["GET", "OPTIONS"],
-  authLevel: "anonymous",
-  route: "armory/products/{id}",
-  handler: getProduct,
-});
+// ═════════════════════════════════════════════════════
+// CREATE PRODUCT
+// ═════════════════════════════════════════════════════
 
-// ===== CREATE PRODUCT =====
-export async function createProduct(
+async function createProduct(
   request: HttpRequest,
   context: InvocationContext,
 ): Promise<HttpResponseInit> {
-  if (request.method === "OPTIONS") return handlePreflight(request);
-
   context.log("POST /api/armory/products");
 
   const authContext = await authenticateUser(request, context);
@@ -196,20 +240,14 @@ export async function createProduct(
   }
 }
 
-app.http("armory-products-create", {
-  methods: ["POST", "OPTIONS"],
-  authLevel: "anonymous",
-  route: "armory/products",
-  handler: createProduct,
-});
+// ═════════════════════════════════════════════════════
+// UPDATE PRODUCT
+// ═════════════════════════════════════════════════════
 
-// ===== UPDATE PRODUCT =====
-export async function updateProduct(
+async function updateProduct(
   request: HttpRequest,
   context: InvocationContext,
 ): Promise<HttpResponseInit> {
-  if (request.method === "OPTIONS") return handlePreflight(request);
-
   context.log("PUT /api/armory/products/{id}");
 
   const authContext = await authenticateUser(request, context);
@@ -337,20 +375,14 @@ export async function updateProduct(
   }
 }
 
-app.http("armory-products-update", {
-  methods: ["PUT", "OPTIONS"],
-  authLevel: "anonymous",
-  route: "armory/products/{id}",
-  handler: updateProduct,
-});
+// ═════════════════════════════════════════════════════
+// DELETE PRODUCT (SOFT DELETE)
+// ═════════════════════════════════════════════════════
 
-// ===== DELETE PRODUCT (SOFT DELETE) =====
-export async function deleteProduct(
+async function deleteProduct(
   request: HttpRequest,
   context: InvocationContext,
 ): Promise<HttpResponseInit> {
-  if (request.method === "OPTIONS") return handlePreflight(request);
-
   context.log("DELETE /api/armory/products/{id}");
 
   const authContext = await authenticateUser(request, context);
@@ -420,10 +452,3 @@ export async function deleteProduct(
     });
   }
 }
-
-app.http("armory-products-delete", {
-  methods: ["DELETE", "OPTIONS"],
-  authLevel: "anonymous",
-  route: "armory/products/{id}",
-  handler: deleteProduct,
-});
