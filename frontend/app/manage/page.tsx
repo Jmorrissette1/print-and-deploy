@@ -47,7 +47,7 @@ export default function ManagePage() {
       const token = await getToken();
       if (!token) return;
 
-      const response = await fetch(`${apiBaseUrl}/api/manage/products`, {
+      const response = await fetch(`${apiBaseUrl}/api/armory/products`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -69,7 +69,7 @@ export default function ManagePage() {
       const token = await getToken();
       if (!token) return;
 
-      const response = await fetch(`${apiBaseUrl}/api/manage/products/${id}`, {
+      const response = await fetch(`${apiBaseUrl}/api/armory/products/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -95,7 +95,7 @@ export default function ManagePage() {
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-red-800">Product Inventory</h1>
         <Link
-          href="/manage/create"
+          href="/armory/create"
           className="bg-red-900 hover:bg-red-800 text-white px-6 py-2 font-bold border-2 border-red-800 transition-all"
         >
           + Add Product
@@ -125,7 +125,7 @@ export default function ManagePage() {
       {!loading && !error && products.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-400 text-xl mb-4">No products yet</p>
-          <Link href="/manage/create" className="text-red-700 underline">
+          <Link href="/armory/create" className="text-red-700 underline">
             Add your first product
           </Link>
         </div>
@@ -204,7 +204,7 @@ export default function ManagePage() {
                   <td className="py-3 px-4 text-right">
                     <div className="flex gap-3 justify-end">
                       <Link
-                        href={`/manage/edit/${product.id}`}
+                        href={`/armory/edit/${product.id}`}
                         className="text-purple-400 hover:text-purple-300 text-sm font-semibold transition"
                       >
                         Edit

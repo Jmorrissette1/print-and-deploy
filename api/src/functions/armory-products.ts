@@ -16,7 +16,7 @@ export async function listProducts(
 ): Promise<HttpResponseInit> {
   if (request.method === "OPTIONS") return handlePreflight(request);
 
-  context.log("GET /api/manage/products");
+  context.log("GET /api/armory/products");
 
   const authContext = await authenticateUser(request, context);
 
@@ -59,10 +59,10 @@ export async function listProducts(
   }
 }
 
-app.http("manage-products-list", {
+app.http("armory-products-list", {
   methods: ["GET", "OPTIONS"],
   authLevel: "anonymous",
-  route: "manage/products",
+  route: "armory/products",
   handler: listProducts,
 });
 
@@ -73,7 +73,7 @@ export async function getProduct(
 ): Promise<HttpResponseInit> {
   if (request.method === "OPTIONS") return handlePreflight(request);
 
-  context.log("GET /api/manage/products/{id}");
+  context.log("GET /api/armory/products/{id}");
 
   const authContext = await authenticateUser(request, context);
 
@@ -121,10 +121,10 @@ export async function getProduct(
   }
 }
 
-app.http("manage-products-get", {
+app.http("armory-products-get", {
   methods: ["GET", "OPTIONS"],
   authLevel: "anonymous",
-  route: "manage/products/{id}",
+  route: "armory/products/{id}",
   handler: getProduct,
 });
 
@@ -135,7 +135,7 @@ export async function createProduct(
 ): Promise<HttpResponseInit> {
   if (request.method === "OPTIONS") return handlePreflight(request);
 
-  context.log("POST /api/manage/products");
+  context.log("POST /api/armory/products");
 
   const authContext = await authenticateUser(request, context);
 
@@ -196,10 +196,10 @@ export async function createProduct(
   }
 }
 
-app.http("manage-products-create", {
+app.http("armory-products-create", {
   methods: ["POST", "OPTIONS"],
   authLevel: "anonymous",
-  route: "manage/products",
+  route: "armory/products",
   handler: createProduct,
 });
 
@@ -210,7 +210,7 @@ export async function updateProduct(
 ): Promise<HttpResponseInit> {
   if (request.method === "OPTIONS") return handlePreflight(request);
 
-  context.log("PUT /api/manage/products/{id}");
+  context.log("PUT /api/armory/products/{id}");
 
   const authContext = await authenticateUser(request, context);
 
@@ -337,10 +337,10 @@ export async function updateProduct(
   }
 }
 
-app.http("manage-products-update", {
+app.http("armory-products-update", {
   methods: ["PUT", "OPTIONS"],
   authLevel: "anonymous",
-  route: "manage/products/{id}",
+  route: "armory/products/{id}",
   handler: updateProduct,
 });
 
@@ -351,7 +351,7 @@ export async function deleteProduct(
 ): Promise<HttpResponseInit> {
   if (request.method === "OPTIONS") return handlePreflight(request);
 
-  context.log("DELETE /api/manage/products/{id}");
+  context.log("DELETE /api/armory/products/{id}");
 
   const authContext = await authenticateUser(request, context);
 
@@ -421,9 +421,9 @@ export async function deleteProduct(
   }
 }
 
-app.http("manage-products-delete", {
+app.http("armory-products-delete", {
   methods: ["DELETE", "OPTIONS"],
   authLevel: "anonymous",
-  route: "manage/products/{id}",
+  route: "armory/products/{id}",
   handler: deleteProduct,
 });

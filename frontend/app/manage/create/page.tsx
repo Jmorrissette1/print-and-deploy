@@ -56,7 +56,7 @@ export default function CreateProductPage() {
         stock: form.stock ? parseInt(form.stock) : undefined,
       };
 
-      const response = await fetch(`${apiBaseUrl}/api/manage/products`, {
+      const response = await fetch(`${apiBaseUrl}/api/armory/products`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

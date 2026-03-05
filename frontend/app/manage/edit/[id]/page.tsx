@@ -46,7 +46,7 @@ export default function EditProductPage() {
       const token = await getToken();
       if (!token) return;
 
-      const response = await fetch(`${apiBaseUrl}/api/manage/products/${id}`, {
+      const response = await fetch(`${apiBaseUrl}/api/armory/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -86,7 +86,7 @@ export default function EditProductPage() {
       body.inStock = form.inStock;
       if (form.stock) body.stock = parseInt(form.stock);
 
-      const response = await fetch(`${apiBaseUrl}/api/manage/products/${id}`, {
+      const response = await fetch(`${apiBaseUrl}/api/armory/products/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -100,7 +100,7 @@ export default function EditProductPage() {
         throw new Error(data.message || "Failed to update product");
       }
 
-      router.push("/manage");
+      router.push("/armory");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -125,7 +125,7 @@ export default function EditProductPage() {
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-red-800">Edit Product</h1>
         <Link
-          href="/manage"
+          href="/armory"
           className="text-gray-500 hover:text-gray-300 transition"
         >
           ← Back to Inventory
@@ -239,7 +239,7 @@ export default function EditProductPage() {
             {saving ? "Saving..." : "Save Changes"}
           </button>
           <Link
-            href="/manage"
+            href="/armory"
             className="bg-transparent text-gray-400 hover:text-gray-200 px-8 py-3 font-bold border-2 border-gray-700 transition-all"
           >
             Cancel
