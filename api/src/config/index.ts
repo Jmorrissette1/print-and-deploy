@@ -13,4 +13,5 @@ export const ALLOWED_ORIGINS = [
   "https://www.printanddeploy.com",
   "https://printanddeploy.com",
   "http://localhost:3000",
+  "https://gray-water-0fd24721e.1.azurestaticapps.net/",
 ];
