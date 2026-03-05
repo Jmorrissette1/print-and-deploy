@@ -6,7 +6,7 @@ export default function Home() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="text-4xl">Logo here</div>
+              <div className="text-4xl">Logo</div>
               <div>
                 <h1 className="text-3xl font-bold text-red-800 tracking-wider">
                   PRINT AND DEPLOY
@@ -41,10 +41,10 @@ export default function Home() {
       <section className="relative bg-gradient-to-b from-black via-purple-950/10 to-black">
         <div className="absolute inset-0 opacity-5 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')]"></div>
         {/* Hero Image */}
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/images/hero-img.png')",}}>
-        </div>
+          style={{ backgroundImage: "url('/images/hero-img.png')" }}
+        ></div>
         <div className="container mx-auto px-4 py-24 text-center relative z-10">
           <div className="mb-8">
             <div className="text-7xl mb-6 text-red-900">⚔️</div>
@@ -81,7 +81,6 @@ export default function Home() {
         </div>
       </section>
 
-      
       <section className="bg-black border-y border-red-950">
         <div className="container mx-auto px-4 py-20">
           <div className="grid md:grid-cols-3 gap-8">
@@ -89,7 +88,6 @@ export default function Home() {
               className="bg-gradient-to-b from-red-950/20 to-black p-8 border border-red-950/70 
                           hover:border-red-800/70 transition-all group"
             >
-              <div className="text-5xl mb-6 text-red-800">🎨</div>
               <h3 className="text-2xl font-bold text-red-700 mb-4">
                 Premium Quality
               </h3>
@@ -104,7 +102,6 @@ export default function Home() {
               className="bg-gradient-to-b from-purple-950/20 to-black p-8 border border-purple-900/50 
                           hover:border-purple-700/70 transition-all group"
             >
-              <div className="text-5xl mb-6 text-purple-500">⚡</div>
               <h3 className="text-2xl font-bold text-purple-400 mb-4">
                 Fast Shipping
               </h3>
@@ -119,7 +116,6 @@ export default function Home() {
               className="bg-gradient-to-b from-red-950/20 to-black p-8 border border-red-950/70 
                           hover:border-red-800/70 transition-all group"
             >
-              <div className="text-5xl mb-6 text-red-800">🛡️</div>
               <h3 className="text-2xl font-bold text-red-700 mb-4">
                 Battle-Ready
               </h3>
