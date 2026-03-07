@@ -95,7 +95,7 @@ export default function ManagePage() {
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-red-800">Product Inventory</h1>
         <Link
-          href="/armory/create"
+          href="/manage/create"
           className="bg-red-900 hover:bg-red-800 text-white px-6 py-2 font-bold border-2 border-red-800 transition-all"
         >
           + Add Product
