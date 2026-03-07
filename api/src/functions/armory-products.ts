@@ -20,6 +20,12 @@ async function armoryProductsCollection(
 ): Promise<HttpResponseInit> {
   if (request.method === "OPTIONS") return handlePreflight(request);
 
+  context.log("Method:", request.method);
+  context.log(
+    "Auth header:",
+    request.headers.get("authorization")?.substring(0, 20) || "MISSING",
+  );
+
   if (request.method === "GET") return listProducts(request, context);
   if (request.method === "POST") return createProduct(request, context);
 
